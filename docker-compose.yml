@@ -1,0 +1,48 @@
+# docker-compose.yml (place at root of pruthvirajul-claims/)
+version: '3.8'
+
+services:
+  employee-side-claim:
+    build: ./employee-side-claim
+    ports:
+      - "6756:80"
+    depends_on:
+      - backend
+
+  hr-claim:
+    build: ./hr-claim
+    ports:
+      - "6757:80"
+    depends_on:
+      - backend
+
+  backend:
+    build: ./Backend
+    ports:
+      - "3099:3099"
+    environment:
+      - PORT=3099
+      - DB_USER=postgres
+      - DB_PASSWORD=admin321
+      - DB_NAME=employee_claims_db
+      - DB_HOST=postgres
+      - DB_PORT=5432
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:14
+    restart: always
+    ports:
+      - "5479:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin321
+      POSTGRES_DB: employee_claims_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  pgdata:
+
